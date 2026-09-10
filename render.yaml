@@ -51,13 +51,12 @@ services:
         value: 3.11.0
 
   # ============================================
-  # FRONTEND (React static)
+  # FRONTEND (React static) — БЕЗ region!
   # ============================================
   - type: web
     name: sellex-frontend
     runtime: static
     plan: free
-    region: frankfurt
     branch: main
     rootDir: frontend
     buildCommand: npm install && npm run build
@@ -83,7 +82,7 @@ services:
         value: 18.18.0
 
   # ============================================
-  # REDIS (для очереди задач)
+  # REDIS
   # ============================================
   - type: redis
     name: sellex-redis
