@@ -1,15 +1,12 @@
 services:
-  # ============================================
-  # BACKEND API (FastAPI) - путь к Dockerfile из корня
-  # ============================================
   - type: web
-  name: sellex-api
-  runtime: docker
-  plan: free
-  region: frankfurt
-  branch: main
-  dockerfilePath: ./backend/Dockerfile
-  healthCheckPath: /health
+    name: sellex-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: main
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /health
     autoDeploy: true
     envVars:
       - key: DATABASE_URL
@@ -41,46 +38,3 @@ services:
         sync: false
       - key: OPENROUTER_API_KEY
         sync: false
-
-  # ============================================
-  # FRONTEND (React static)
-  # ============================================
-  - type: web
-    name: sellex-frontend
-    runtime: static
-    branch: main
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./build
-    autoDeploy: true
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: REACT_APP_API_URL
-        value: https://sellex-api.onrender.com
-      - key: NODE_VERSION
-        value: 18.18.0
-
-  # ============================================
-  # REDIS
-  # ============================================
-  - type: redis
-    name: sellex-redis
-    plan: free
-    region: frankfurt
-    maxmemoryPolicy: noeviction
-    ipAllowList: []
-
-# ============================================
-# DATABASE
-# ============================================
-databases:
-  - name: sellex-db
-    databaseName: sellex
-    user: sellex_user
-    plan: free
-    region: frankfurt
-    postgresMajorVersion: "15"
-    ipAllowList: []
