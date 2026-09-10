@@ -8,8 +8,8 @@ services:
     plan: free
     region: frankfurt
     branch: main
-    dockerfilePath: ./backend/Dockerfile    # путь от корня репо
-    dockerContext: ./backend                # контекст от корня репо
+    dockerContext: ./backend
+    dockerfilePath: ./Dockerfile
     healthCheckPath: /health
     autoDeploy: true
     envVars:
@@ -74,6 +74,9 @@ services:
     maxmemoryPolicy: noeviction
     ipAllowList: []
 
+# ============================================
+# DATABASE
+# ============================================
 databases:
   - name: sellex-db
     databaseName: sellex
