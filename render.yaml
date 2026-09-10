@@ -9,7 +9,7 @@ services:
     region: frankfurt
     branch: main
     dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    
     healthCheckPath: /health
     autoDeploy: true
     envVars:
