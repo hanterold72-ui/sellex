@@ -5,12 +5,11 @@ services:
   - type: web
     name: sellex-api
     runtime: docker
-    plan: free              # ← было 0.1c-512mb, верните free
+    plan: free
     region: frankfurt
     branch: main
-    rootDir: .
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile    # путь от корня репо
+    dockerContext: ./backend                # контекст от корня репо
     healthCheckPath: /health
     autoDeploy: true
     envVars:
@@ -43,15 +42,9 @@ services:
         sync: false
       - key: OPENROUTER_API_KEY
         sync: false
-      - key: GENERATED_DIR
-        value: /app/generated
-      - key: UPLOAD_DIR
-        value: /app/uploads
-      - key: PYTHON_VERSION
-        value: 3.11.0
 
   # ============================================
-  # FRONTEND (React static) — БЕЗ region и plan
+  # FRONTEND (React static)
   # ============================================
   - type: web
     name: sellex-frontend
@@ -65,18 +58,9 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
-    headers:
-      - path: /*
-        name: X-Frame-Options
-        value: SAMEORIGIN
-      - path: /*
-        name: X-Content-Type-Options
-        value: nosniff
     envVars:
       - key: REACT_APP_API_URL
         value: https://sellex-api.onrender.com
-      - key: REACT_APP_APP_NAME
-        value: Sellex
       - key: NODE_VERSION
         value: 18.18.0
 
@@ -90,9 +74,6 @@ services:
     maxmemoryPolicy: noeviction
     ipAllowList: []
 
-# ============================================
-# DATABASE
-# ============================================
 databases:
   - name: sellex-db
     databaseName: sellex
