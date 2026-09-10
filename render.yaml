@@ -1,6 +1,6 @@
 services:
   # ============================================
-  # BACKEND API (FastAPI)
+  # BACKEND API (FastAPI) - путь к Dockerfile из корня
   # ============================================
   - type: web
     name: sellex-api
@@ -8,8 +8,8 @@ services:
     plan: free
     region: frankfurt
     branch: main
+    dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    dockerfilePath: ./Dockerfile
     healthCheckPath: /health
     autoDeploy: true
     envVars:
