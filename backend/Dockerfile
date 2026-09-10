@@ -1,7 +1,7 @@
 FROM python:3.11-slim
 
 WORKDIR /app
-ENV PYTHONPATH=/app
+
 
 RUN apt-get update && apt-get install -y \
     gcc \
@@ -23,4 +23,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 
 EXPOSE 8000
 
+ENV PYTHONPATH=/app
 CMD ["gunicorn", "app.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000"]
