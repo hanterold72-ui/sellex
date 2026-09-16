@@ -10,12 +10,26 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
-    
+
     if (token && savedUser) {
+      // Сразу ставим из кэша
       setUser(JSON.parse(savedUser));
-      api.me().catch(() => logout());
+
+      // Синхронизируем с сервером — план и кредиты актуализируются
+      api
+        .me()
+        .then(({ data }) => {
+          const merged = { ...JSON.parse(savedUser), ...data };
+          setUser(merged);
+          localStorage.setItem('user', JSON.stringify(merged));
+        })
+        .catch(() => {
+          logout();
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const login = async (email, password) => {
@@ -50,8 +64,22 @@ export function AuthProvider({ children }) {
     setUser(updated);
   };
 
+  const refreshUser = async () => {
+    try {
+      const { data } = await api.me();
+      const merged = { ...user, ...data };
+      setUser(merged);
+      localStorage.setItem('user', JSON.stringify(merged));
+      return merged;
+    } catch (e) {
+      return null;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateCredits }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, register, logout, updateCredits, refreshUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
