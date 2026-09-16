@@ -7,19 +7,28 @@ import Navbar from '../components/Navbar';
 import Loader from '../components/Loader';
 
 export default function Admin() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user || user.plan !== 'admin') {
+    if (authLoading) return;
+
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    if (user.plan !== 'admin') {
+      toast.error('Доступ только для администраторов');
       navigate('/dashboard');
       return;
     }
+
     loadData();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const loadData = async () => {
     try {
@@ -30,7 +39,7 @@ export default function Admin() {
       setStats(statsRes.data);
       setUsers(usersRes.data.users);
     } catch (err) {
-      toast.error('Ошибка загрузки');
+      toast.error('Ошибка загрузки: ' + (err.response?.data?.detail || err.message));
     } finally {
       setLoading(false);
     }
@@ -58,7 +67,8 @@ export default function Admin() {
     }
   };
 
-  if (loading) return <Loader />;
+  if (authLoading || loading) return <Loader />;
+  if (!user || user.plan !== 'admin') return null;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
@@ -70,10 +80,10 @@ export default function Admin() {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-10">
           {[
-            { label: 'Пользователей', value: stats?.total.users },
-            { label: 'Активных', value: stats?.total.active_users },
-            { label: 'Генераций', value: stats?.total.generations },
-            { label: 'Доход', value: `${stats?.total.revenue} ₽` },
+            { label: 'Пользователей', value: stats?.total?.users },
+            { label: 'Активных', value: stats?.total?.active_users },
+            { label: 'Генераций', value: stats?.total?.generations },
+            { label: 'Доход', value: `${stats?.total?.revenue || 0} ₽` },
           ].map((s) => (
             <div key={s.label} className="card text-center">
               <div className="text-3xl font-black text-primary-500">{s.value || 0}</div>
@@ -107,10 +117,16 @@ export default function Admin() {
                     </span>
                   </td>
                   <td className="px-6 py-4 flex gap-2">
-                    <button onClick={() => handleAddCredits(u.id)} className="text-primary-500 hover:underline text-sm">
+                    <button
+                      onClick={() => handleAddCredits(u.id)}
+                      className="text-primary-500 hover:underline text-sm"
+                    >
                       💰
                     </button>
-                    <button onClick={() => handleToggle(u.id)} className="text-red-400 hover:underline text-sm">
+                    <button
+                      onClick={() => handleToggle(u.id)}
+                      className="text-red-400 hover:underline text-sm"
+                    >
                       {u.is_active ? '🚫' : '✅'}
                     </button>
                   </td>
